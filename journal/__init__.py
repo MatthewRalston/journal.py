@@ -31,97 +31,25 @@ import logging
 import logging.config
 
 
+from journal import helpers
 
-import inquirer
-from prompt_toolkit import PromptSession
-from prompt_toolkit.key_binding import KeyBindings
-from pydantic import BaseModel, Field, TypeAdapter, ValidationError
-from typing import List, Literal, Union, Annotated, Optional
+
 
 ####################
 # CONSTANTS
 ####################
 
-kb = KeyBindings()
+
 
 prompts_toml = os.path.join(os.path.dirname(__file__), "prompts.toml")
 
 
 
-@kb.add('c-n')
-def _(event):
-    event.app.exit(result=event.app.current_buffer.text)
-
-session = PromptSession(multiline=True, key_bindings=kb)
     
 ####################
 # DATATYPES
 ####################
 
-class PromptBase(BaseModel):
-    name: str
-    prompt: str
-    type: str
-    description: str
-
-class BooleanPrompt(PromptBase):
-    type: Literal["boolean"]
-    default: Optional[bool] = None
-
-class ChoicePrompt(PromptBase):
-    type: Literal["choice"]
-    choices: List[str]
-    default: Optional[str] = None
-
-    def validate_selection(self, selection: str):
-        if selection not in self.choices:
-            raise ValueError("journal.ChoicePrompt.validate_selection: Invalid selection '{0}'. Must be one of {1}".format(selection, self.choices))
-
-class MultiChoicePrompt(PromptBase):
-    type: Literal["multichoice"]
-    choices: List[str]
-    default: Optional[List[str]] = None
-
-    def validate_selections(self, selections: str):
-        for s in selections:
-            if s not in self.choices:
-                raise ValueError("journal.MultiChoicePrompt.validate_selection: Invalid selection '{0}'. Must be one of {1}".format(s, self.choices))
-
-class TextPrompt(PromptBase):
-    type: Literal["text"]
-    default: Optional[str] = None
-
-class SingleLinePrompt(PromptBase):
-    type: Literal["singleline"]
-    default: Optional[str] = None
-
-class MultiLinePrompt(PromptBase):
-    type: Literal["multiline"]
-    default: Optional[str] = None
-
-class BeliefPrompt(PromptBase):
-    type: Literal["belief"]
-    default: Optional[dict] = None
-
-    # Custom validation
-    scale_min: int = 1
-    scale_max: int = 10
-    scale_label: Optional[str] = "How strong is this belief?"
-    reason_label: Optional[str] = "Why?"
-
-PromptType = Annotated[
-    Union[
-        BooleanPrompt,
-        ChoicePrompt,
-        MultiChoicePrompt,
-        TextPrompt,
-        SingleLinePrompt,
-        MultiLinePrompt,
-        BeliefPrompt
-    ],
-    Field(discriminator="type")
-]
-adapter = TypeAdapter(PromptType)
 
 
 """
@@ -141,8 +69,14 @@ belief : dual prompt: 1:10 and single line explanation
 # FUNCTIONS
 ####################
 
-def prompt_boolean():
-    prompt_data = {
+
+def main():
+    with open(prompts_toml, 'rb') as ifile:
+        prompts = tomllib.load(ifile)
+        print(prompts)
+        #first = text_input("foo")
+
+    bool_prompt_data  = {
         "type": "boolean",
         "name": "bool_ex",
         "prompt": "Do you enjoy programeing",
@@ -150,25 +84,10 @@ def prompt_boolean():
         "default": "False"
     }
 
-    prompt = BooleanPrompt(**prompt_data)
-    prompt_obj = adapter.validate_python(prompt)
-    sys.stderr.write(prompt.description + "\n")
-    answers = inquirer.prompt([
-        inquirer.Confirm(
-            name=prompt.name,
-            message=prompt.prompt,
-            default=prompt.default
-        )
-    ])
-    try:
-        user_input = answers[prompt.name]
-    except ValidationError as e:
-        raise e
-    return user_input
-    #print(prompt_obj.prompt.model_dump_json(indent=2))
+        
+    helpers.prompt_boolean(bool_prompt_data)
 
-def prompt_choice():
-    prompt_data = {
+    choice_prompt_data = {
         "type": "choice",
         "name": "choice_ex",
         "prompt": "Do you enjoy programeing?",
@@ -177,25 +96,9 @@ def prompt_choice():
         "choices": ["True", "False", "Maybe"]
     }
 
-    prompt = ChoicePrompt(**prompt_data)
-    sys.stderr.write(prompt.description + "\n")
-    answers = inquirer.prompt([
-        inquirer.List(
-            name=prompt.name,
-            message=prompt.prompt,
-            choices=prompt.choices,
-            default=prompt.default
-        )])
-    try:
-        user_input = answers[prompt.name]
-        prompt.validate_selection(user_input)
-    except ValidationError as e:
-        raise e
-    return user_input
+    helpers.prompt_choice(choice_prompt_data)
     
-
-def prompt_multichoice():
-    prompt_data = {
+    multichoice_prompt_data = {
         "type": "multichoice",
         "name": "multichoice_ex",
         "prompt": "Select from the following",
@@ -203,76 +106,57 @@ def prompt_multichoice():
         "default": ["Python"],
         "choices": ["Python", "Ruby", "Julia", "Javascript", "Rust", "R"]
     }
-    prompt = MultiChoicePrompt(**prompt_data)
-    sys.stderr.write(prompt.description + "\n")
-    answers = inquirer.prompt([
-        inquirer.Checkbox(
-            name=prompt.name,
-            message=prompt.prompt,
-            choices=prompt.choices,
-            default=prompt.default
-        )
-    ])
 
-    try:
-        user_input = answers[prompt.name]
-        prompt.validate_selections(user_input)
-        # print("Selections:")
-        # print(user_input)
-    except ValidationError as e:
-        raise e
-    return user_input
+    
+    
+    helpers.prompt_multichoice(multichoice_prompt_data)
 
-
-def prompt_text():
-    prompt_data = {
+    text_prompt_data = {
         "type": "text",
         "name": "text_ex",
         "prompt": "Describe what you enjoy about programming",
         "description": "Do you like programming?",
     }
-    prompt = TextPrompt(**prompt_data)
-    sys.stderr.write(prompt.description + "\n")
-    user_input = text_input(prompt.prompt)
-    if type(user_input) is not str:
-        raise TypeError("journal.prompt_text expects a str from user input.")
-    return user_input
-        
 
-def get_multiline(prompts):
-    if not all(type(p) is str for p in prompts):
-        raise TypeError("multiline expects a list of str as its first positional argument")
+    helpers.prompt_text(text_prompt_data)
 
-    answers = []
-    for p in prompts:
-        lines = []
-        sys.stderr.write(p + " : (One line at a time)\n")
-        while True:
-            line = input()
-            if line == "":
-                break
-            lines.append(line)
-        print(lines)
-        answers.append(lines)
-    return answers
+    singleline_prompt_data = {
+        "type": "singleline",
+        "name": "singleline_ex",
+        "prompt": "Describe what you like about programming in one line",
+        "description": "Do you really like programming?"
+    }
 
-def text_input(prompt):
+    helpers.prompt_singleline(singleline_prompt_data)
 
-    sys.stderr.write(prompt + "\n")
-    text = session.prompt("Enter text (Ctrl+n to submit):\n")
-    #print("Your text: \n{0}".format(text))
-    return text
+    multiline_prompt_data = {
+        "type": "singleline",
+        "name": "singleline_ex",
+        "prompt": "Describe 2 things you like about programming ",
+        "description": "Do you really REALLY like programming?"
+    }
+    helpers.prompt_multiline(multiline_prompt_data)
 
-def main():
-    with open(prompts_toml, 'rb') as ifile:
-        prompts = tomllib.load(ifile)
-        print(prompts)
-        #first = text_input("foo")
-    prompt_boolean()
-    prompt_choice()
-    prompt_multichoice()
-    prompt_text()
 
+    belief_prompt_data = {
+        "type": "belief",
+        "name": "belief_ex",
+        "prompt": "Describe one thing you like about programming ",
+        "description": "Do you really REALLY like programming?"
+    }
+
+    helpers.prompt_belief(belief_prompt_data)
+
+    belieflist_prompt_data = {
+        "type": "belief",
+        "name": "belieflist_ex",
+        "prompt": "What are a few healthy beliefs about a programming career?",
+        "description": "Do you really REALLY REALLY like programming?"
+    }
+
+    
+    helpers.prompt_belief_list(belieflist_prompt_data)
+    
 def cli():
     # parser = argparse.ArgumentParser()
     # parser.add_argument('--required', help="Required argument",required=True)
