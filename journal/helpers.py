@@ -4,11 +4,25 @@ import os
 
 
 import inquirer
+
+from pygments import highlight
+from pygments.formatters import Terminal256Formatter
+
+from pygments.lexers import TextLexer
+from pygments.lexer import Lexer
+from pygments.style import Style
+
+from pygments.token import Token
+
+
+
 from prompt_toolkit import PromptSession
 from prompt_toolkit.key_binding import KeyBindings
 
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
+
+
 
 from journal import prompts, schemas
 
@@ -20,9 +34,20 @@ RESET = "\033[0m"
 
 question_mark = f"[{YELLOW}?{RESET}] "
 
-
 kb = KeyBindings()
 
+
+class JournalPromptStyle(Style):
+    default_style = ""
+    styles = {
+        Token.Text: "bg:#002200 #00ff00",
+    }
+
+
+class PlainGreenLexer(Lexer):
+    def get_tokens_unprocessed(self, text):
+        yield 0, Token.Text, text
+    
 # Use Ctrl+n to exit text entry
 @kb.add('c-n')
 def _(event):
@@ -46,16 +71,25 @@ def prompt_boolean(prompt_data):
 
     prompt = prompts.BooleanPrompt(**prompt_data)
     prompt_obj = prompts.adapter.validate_python(prompt)
-    sys.stderr.write(prompt.description + "\n")
+
+
+    desc = "{0}\n{0}\n{1}\n{0}\n{0}".format(" "*len(prompt.description), prompt.description)
+    highlighted = highlight(desc, PlainGreenLexer(), Terminal256Formatter(style=JournalPromptStyle))
+    
+    
+    sys.stderr.write(highlighted)
+
     answers = inquirer.prompt([
         inquirer.Confirm(
             name=prompt.name,
             message=prompt.prompt,
-            default=prompt.default
+            default=False
         )
     ])
     user_input = answers[prompt.name]
+    #sys.stderr.write(">'{0}'<\n".format(user_input))
     if type(user_input) is not bool:
+        sys.stderr.write(">'{0}'<\n".format(user_input))
         raise ValueError("journal.prompt_boolean expects user input to be a boolean (y/n)")
     return user_input
     #print(prompt_obj.prompt.model_dump_json(indent=2))
@@ -67,7 +101,16 @@ def prompt_choice(prompt_data):
         raise e
 
     prompt = prompts.ChoicePrompt(**prompt_data)
-    sys.stderr.write(prompt.description + "\n")
+
+    
+    desc = "{0}\n{0}\n{1}\n{0}\n{0}".format(" "*len(prompt.description), prompt.description)
+    highlighted = highlight(desc, PlainGreenLexer(), Terminal256Formatter(style=JournalPromptStyle))
+    
+    
+    sys.stderr.write(highlighted)
+
+
+    
     answers = inquirer.prompt([
         inquirer.List(
             name=prompt.name,
@@ -91,7 +134,13 @@ def prompt_multichoice(prompt_data):
         raise e
 
     prompt = prompts.MultiChoicePrompt(**prompt_data)
-    sys.stderr.write(prompt.description + "\n")
+
+    desc = "{0}\n{0}\n{1}\n{0}\n{0}".format(" "*len(prompt.description), prompt.description)
+    highlighted = highlight(desc, PlainGreenLexer(), Terminal256Formatter(style=JournalPromptStyle))
+    
+    
+    sys.stderr.write(highlighted)
+
     answers = inquirer.prompt([
         inquirer.Checkbox(
             name=prompt.name,
@@ -120,7 +169,13 @@ def prompt_text(prompt_data):
 
 
     prompt = prompts.TextPrompt(**prompt_data)
-    sys.stderr.write(prompt.description + "\n")
+
+    desc = "{0}\n{0}\n{1}\n{0}\n{0}".format(" "*len(prompt.description), prompt.description)
+    highlighted = highlight(desc, PlainGreenLexer(), Terminal256Formatter(style=JournalPromptStyle))
+    
+    
+    sys.stderr.write(highlighted)
+
     user_input = text_input(prompt.prompt)
     if type(user_input) is not str:
         raise TypeError("journal.prompt_text expects a str from user input.")
@@ -137,7 +192,13 @@ def prompt_singleline(prompt_data):
 
     
     prompt = prompts.SingleLinePrompt(**prompt_data)
-    sys.stderr.write("\n\n" + prompt.description + "\n\n")
+
+    desc = "{0}\n{0}\n{1}\n{0}\n{0}".format(" "*len(prompt.description), prompt.description)
+    highlighted = highlight(desc, PlainGreenLexer(), Terminal256Formatter(style=JournalPromptStyle))
+    
+    
+    sys.stderr.write(highlighted)
+
     sys.stderr.write(question_mark + prompt.prompt + "\n")
     user_input = input()
     # print("User input:")
@@ -158,13 +219,19 @@ def prompt_multiline(prompt_data):
 
 
     
-    prompt = prompts.SingleLinePrompt(**prompt_data)
-    sys.stderr.write("\n\n" + prompt.description + "\n\n")
+    prompt = prompts.MultiLinePrompt(**prompt_data)
+
+    desc = "{0}\n{0}\n{1}\n{0}\n{0}".format(" "*len(prompt.description), prompt.description)
+    highlighted = highlight(desc, PlainGreenLexer(), Terminal256Formatter(style=JournalPromptStyle))
+    
+    
+    sys.stderr.write(highlighted)
+
     sys.stderr.write(question_mark + prompt.prompt + "\n\n")
-    sys.stderr.write("List answers (Empty answer ends input.):\n")
+    sys.stderr.write("List your answers below (Empty response terminates):\n")
     lines = []
     while True:
-        line = input()
+        line = input(">")
         if line == "":
             break
         else:
@@ -211,7 +278,12 @@ def prompt_belief(prompt_data):
 
 
     prompt = prompts.BeliefPrompt(**prompt_data)
-    sys.stderr.write("\n\n" + prompt.description + "\n\n")
+
+    desc = "{0}\n{0}\n{1}\n{0}\n{0}".format(" "*len(prompt.description), prompt.description)
+    highlighted = highlight(desc, PlainGreenLexer(), Terminal256Formatter(style=JournalPromptStyle))
+    
+    
+    sys.stderr.write(highlighted)
     
     sys.stderr.write(question_mark + prompt.prompt + "\n\n")
 
@@ -245,8 +317,6 @@ def prompt_belief_list(prompt_data):
                 sys.stderr.write("Unknown error occurred. Try restating reason for belief")
                 raise e
 
-    print("These were the beliefs. I feel incredibly enthused.")
-    print(beliefs)
     return beliefs
     
 

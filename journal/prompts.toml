@@ -1,1 +1,258 @@
-example = "text"
+###########################################################
+##################  boolean         #######################
+###########################################################
+
+
+[bool]
+
+[bool.are_you_functional]
+type = "boolean"
+name = "are_you_functional"
+prompt = "Have you been functional this week?"
+description = "Are you exercising, cooking, and meeting objectives this week?"
+
+[bool.do_you_feel_pleasure]
+type = "boolean"
+name = "do_you_feel_pleasure"
+prompt = "Are you able to feel pleasure with activities?"
+description = "Do you feel pleasure from coding, YouTube, guitar, and DotA2?"
+
+[bool.talking_to_friends]
+type = "boolean"
+name = "talking_to_friends"
+prompt = "Are you talking to your friends?"
+description = "In the last week, have you called or texted your friends?"
+
+[bool.cooking_today]
+type = "boolean"
+name = "cooking_today"
+prompt = "Are you cooking today?"
+description = "What is your plan for groceries, mealprep, and cooking today?"
+
+[bool.exercise_today]
+type = "boolean"
+name = "exercising_today"
+prompt = "Are you exercising today?"
+description = "Are you going to walk, run, or lift today?"
+
+[bool.schedule_appts]
+type = "boolean"
+name = "uptodate_scheduled_appts"
+prompt = "Are you up-to-date on (re)scheduling appointments?"
+description = "Drs. Tramatozzi and Welch, MVP Erin, CCHS, SereneMind?"
+
+
+###########################################################
+##################  choice          #######################
+###########################################################
+
+#[choice]
+
+###########################################################
+##################  multichoice     #######################
+###########################################################
+
+#[multichoice]
+
+###########################################################
+##################  singleline      #######################
+###########################################################
+
+[singleline]
+
+[singleline.next_meeting]
+type = "singleline"
+name = "next_meeting"
+prompt = "When is your next meeting? Do you need to prepare?"
+description = "U.Del lecture? N.A. meeting? Professional?"
+
+
+###########################################################
+##################  multiline       #######################
+###########################################################
+
+[multiline] # list
+
+[multiline.worries_me_today]
+type = "multiline"
+name = "what_worries_me_today"
+prompt = "What worries you today?"
+description = "What subjects are on your mind today? (past events, trauma, anxieties)"
+
+[multiline.looking_forward_to]
+type = "multiline"
+name = "looking_forward_to"
+prompt = "What are you looking forward to?"
+description = "Events, food, shopping, milestone?"
+
+[multiline.how_much_time]
+type = "multiline"
+name = "how_much_time"
+prompt = "How much time can you budget to each item today?"
+description = "For each item on your todo list, how much time does each require?"
+
+[multiline.lieing_to_myself]
+type = "multiline"
+name = "lieing_to_myself"
+prompt = "What lies are you telling yourself?"
+description = "1. What's going wrong? 2. What excuses are there? 3. Assess the lies you believe"
+
+[multiline.what_do_I_need_to_hear]
+type = "multiline"
+name = "what_do_I_need_to_hear"
+prompt = "What do I need to hear today?"
+description = "Write down some words of encouragement. Try to focus on today"
+
+[multiline.what_options_today]
+type = "multiline"
+name = "what_options_today"
+prompt = "What options do I have today?"
+description = "[rethink]: I'm lucky that I have options to choose"
+
+[multiline.what_am_I_unsure_about]
+type = "multiline"
+name = "what_am_I_unsure_about"
+prompt = "What am I confused or unsure about today?"
+description = "Can you talk yourself through these uncertainties?"
+
+[multiline.envision_success]
+type = "multiline"
+name = "envision_success"
+prompt = "Use Reddit/YouTube to envision success. What does it look like?"
+description = "Is it a place? An activity? A mindset?"
+
+[multiline.blocking_issues]
+type = "multiline"
+name = "blocking_issues"
+prompt = "What issues are blocking progress?"
+description = "Either mental-health or work, what are you blockers?"
+
+[multiline.red_flags]
+type = "multiline"
+name = "red_flags"
+prompt = "What red flags do you see?"
+description = "Are you slowing down on exercise, cooking, groceries, journaling? NOTE IT."
+
+[multiline.what_assumptions_matter_today]
+type = "multiline"
+name = "what_assumptions_matter_today"
+prompt = "What assumptions matter *today*?"
+description = "Take a glance at assumptions in the last week. Which ones matter today?"
+
+[multiline.possessions_im_grateful_for]
+type = "multiline"
+name = "possessions_im_grateful_for"
+prompt = "What possessions are you grateful for?"
+description = "Consider your worldly possessions. Which ones are you grateful for this week and why?"
+
+
+
+[multiline.new_blog_post_titles]
+type = "multiline"
+name = "new_blog_post_titles"
+prompt = "Write a new title/topic for a blog post"
+description = "Consider existing tags, current events, and technical topics."
+
+[multiline.well_rounded]
+type = "multiline"
+name = "well_rounded"
+prompt = "How can you become a more well-rounded individual?"
+description = "Health, habits, and happiness. Knowledge, books, interests."
+
+[multiline.same_things]
+type = "multiline"
+name = "same_things"
+prompt = "How can you become better at the same things you focus on?"
+description = "[Biochemistry], programming, research"
+
+[multiline.positive_in_last_week]
+type = "multiline"
+name = "positive_in_last_week"
+prompt = "Name positive things that happened in the last week."
+description = "What happened? How did it make you feel? What positive things do you want to happen?"
+
+[multiline.repeating_positive_habits]
+type = "multiline"
+name = "repeating_positive_habits"
+prompt = "State some positive habits you're noticing are planting roots..."
+description = "[pause]: What positive habits are forming? Which are not?"
+
+
+[multiline.repeating_negative_habits]
+type = "multiline"
+name = "repeating_negative_habits"
+prompt = "State some negative habits/thoughts that are forming..."
+description = "[pause]: What negative habits or thoughts are reinforcing poor self-image"
+
+[multiline.approaching_deadlines]
+type = "multiline"
+name = "approaching_deadlines"
+prompt = "What deadlines are approaching?"
+description = "[review]: Review your phone calendar for the next two months. What deadlines or milestones need attention this week?"
+
+[multiline.diffuse_triggers]
+type = "multiline"
+name = "diffuse_triggers"
+prompt = "What triggers are coming up? How have/should you diffuse them?"
+description = "What activities are helping consistently? What do you notice about these triggering events/feelings?"
+
+[multiline.rewards_today]
+type = "multiline"
+name = "rewards_today"
+prompt = "What rewards can you plan for this week/milestone? How will you achieve the reward?"
+description = "What are the small rewards vs big ones? Can you push the timing of the reward off?"
+
+###########################################################
+##################  text            #######################
+###########################################################
+
+[text]
+
+[text.avoiding]
+type = "text"
+name = "avoiding"
+prompt = "What difficulty are you avoiding?"
+description = "[pause]: What past or future challenges (work/mental) aren't being addressed?"
+
+[text.life_story_last_month]
+type = "text"
+name = "life_story_last_month"
+prompt = "In your life's story, where did you leave things last month?"
+description = "[pause]: Think about your life's story. Write an abridged version in *scratch*. Where does last month's chapter fit in?"
+
+[text.life_story_this_month]
+type = "text"
+name = "life_story_this_month"
+prompt = "In your life's story, how will you make progress this month?"
+description = "[pause]: Think about it. Where does *this* month fit in?"
+
+
+[text.daily_note_mom]
+type = "text"
+name = "daily_note_mom"
+prompt = "Write a note for mom."
+description = "[pause]: think about her helpfulness, cheerfulness, smile, humor, and good nature"
+
+[text.daily_note_dad]
+type = "text"
+name = "daily_note_dad"
+prompt = "Write a note for dad."
+description = "[pause]: think about his encouragement, discipline, routines, and conversations"
+
+[text.opportunity_costs]
+type = "text"
+name = "opportunity_costs"
+prompt = "What are you investing time/effort into today?"
+description = "Who is the source? How difficult is the task?"
+
+[text.negative_event]
+type = "text"
+name = "negative_event"
+prompt = "Name a negative event in your life. What did you miss?"
+description = "What could you have done differently? What does hindsight show? How did it effect you?"
+
+###########################################################
+##################  belief          #######################
+###########################################################
+
+#[belief]

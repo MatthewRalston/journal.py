@@ -24,9 +24,13 @@ import os
 #import argparse
 import copy
 import sys
+
+import random
+
 import tomllib
-#from typeclass import *
-#import ConfigParser
+import yaml
+#import json
+
 import logging
 import logging.config
 
@@ -41,9 +45,9 @@ from journal import helpers
 
 
 
-prompts_toml = os.path.join(os.path.dirname(__file__), "prompts.toml")
+PROMPTS_TOML = os.path.join(os.path.dirname(__file__), "prompts.toml")
 
-
+SAMPLE_MULTILINE = 3
 
     
 ####################
@@ -71,91 +75,73 @@ belief : dual prompt: 1:10 and single line explanation
 
 
 def main():
-    with open(prompts_toml, 'rb') as ifile:
+    with open(PROMPTS_TOML, 'rb') as ifile:
         prompts = tomllib.load(ifile)
-        print(prompts)
-        #first = text_input("foo")
+        #print(prompts)
 
-    bool_prompt_data  = {
-        "type": "boolean",
-        "name": "bool_ex",
-        "prompt": "Do you enjoy programeing",
-        "description": "If you like programming please input True or False",
-        "default": "False"
-    }
-
+    """
+    Booleans
+    """
+    
+    for name, prompt_data in prompts["bool"].items():
+        helpers.prompt_boolean(prompt_data)
         
-    helpers.prompt_boolean(bool_prompt_data)
 
-    choice_prompt_data = {
-        "type": "choice",
-        "name": "choice_ex",
-        "prompt": "Do you enjoy programeing?",
-        "description": "If you like programming please input True, False, or maybe",
-        "default": "False",
-        "choices": ["True", "False", "Maybe"]
-    }
+    """
+    Choices (05/26/25: none)
+    """
+    # helpers.prompt_choice(choice_prompt_data)
 
-    helpers.prompt_choice(choice_prompt_data)
+    """
+    Multichoice (05/26/25: none)
+    """
+    # multichoice_prompt_data = {
+    #     "type": "multichoice",
+    #     "name": "multichoice_ex",
+    #     "prompt": "Select from the following",
+    #     "description": "What languages do you like?",
+    #     "default": ["Python"],
+    #     "choices": ["Python", "Ruby", "Julia", "Javascript", "Rust", "R"]
+    # }
+    # helpers.prompt_multichoice(multichoice_prompt_data)
+    """
+    Text
+    """
+    for name, prompt_data in prompts["text"].items():
+        helpers.prompt_text(prompt_data)
+    """
+    singleline
+    """
+    for name, prompt_data in prompts["singleline"].items():
+        helpers.prompt_singleline(prompt_data)
+    """
+    multiline (05/26/25: random selection)
+    """
+    multiline_prompts = []
+    for name, prompt_data in prompts["multiline"].items():
+        multiline_prompts.append(prompt_data)
+    selected_prompts = random.sample(multiline_prompts, SAMPLE_MULTILINE) # randomly select n prompts from the 21 prompts (05/26/25)
+    for p in selected_prompts:
+        helpers.prompt_multiline(p)
     
-    multichoice_prompt_data = {
-        "type": "multichoice",
-        "name": "multichoice_ex",
-        "prompt": "Select from the following",
-        "description": "What languages do you like?",
-        "default": ["Python"],
-        "choices": ["Python", "Ruby", "Julia", "Javascript", "Rust", "R"]
-    }
+    # belief_prompt_data = {
+    #     "type": "belief",
+    #     "name": "belief_ex",
+    #     "prompt": "Describe one thing you like about programming ",
+    #     "description": "Do you really REALLY like programming?"
+    # }
 
-    
-    
-    helpers.prompt_multichoice(multichoice_prompt_data)
+    # helpers.prompt_belief(belief_prompt_data)
 
-    text_prompt_data = {
-        "type": "text",
-        "name": "text_ex",
-        "prompt": "Describe what you enjoy about programming",
-        "description": "Do you like programming?",
-    }
-
-    helpers.prompt_text(text_prompt_data)
-
-    singleline_prompt_data = {
-        "type": "singleline",
-        "name": "singleline_ex",
-        "prompt": "Describe what you like about programming in one line",
-        "description": "Do you really like programming?"
-    }
-
-    helpers.prompt_singleline(singleline_prompt_data)
-
-    multiline_prompt_data = {
-        "type": "singleline",
-        "name": "singleline_ex",
-        "prompt": "Describe 2 things you like about programming ",
-        "description": "Do you really REALLY like programming?"
-    }
-    helpers.prompt_multiline(multiline_prompt_data)
-
-
-    belief_prompt_data = {
-        "type": "belief",
-        "name": "belief_ex",
-        "prompt": "Describe one thing you like about programming ",
-        "description": "Do you really REALLY like programming?"
-    }
-
-    helpers.prompt_belief(belief_prompt_data)
-
-    belieflist_prompt_data = {
-        "type": "belief",
-        "name": "belieflist_ex",
-        "prompt": "What are a few healthy beliefs about a programming career?",
-        "description": "Do you really REALLY REALLY like programming?"
-    }
+    # belieflist_prompt_data = {
+    #     "type": "belief",
+    #     "name": "belieflist_ex",
+    #     "prompt": "What are a few healthy beliefs about a programming career?",
+    #     "description": "Do you really REALLY REALLY like programming?"
+    # }
 
     
-    helpers.prompt_belief_list(belieflist_prompt_data)
+    # helpers.prompt_belief_list(belieflist_prompt_data)
     
 def cli():
     # parser = argparse.ArgumentParser()

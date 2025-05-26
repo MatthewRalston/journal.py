@@ -10,7 +10,7 @@ boolean_schema = {
         "description": {"type": "string"},
         "default": {"type": "string"}
     },
-    "required": ["type", "name", "prompt", "description", "default"]
+    "required": ["type", "name", "prompt", "description" ]
 }
 
 
