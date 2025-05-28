@@ -251,8 +251,25 @@ name = "negative_event"
 prompt = "Name a negative event in your life. What did you miss?"
 description = "What could you have done differently? What does hindsight show? How did it effect you?"
 
-###########################################################
-##################  belief          #######################
+########################################################### 
+################## belief           #######################
 ###########################################################
 
 #[belief]
+
+
+########################################################### 
+################## belieflist       #######################
+###########################################################
+
+[belieflist]
+
+
+[belieflist.time_management]
+type = "belief"
+name = "time_management"
+prompt = "Create a time budget/schedule for todays tasks."
+description = "What tasks do you have? How much time does each need?"
+scale_label = "How many hours?"
+reason_label = "Describe your task"
+

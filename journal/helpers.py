@@ -1,7 +1,7 @@
 
 import sys
 import os
-
+import re
 
 import inquirer
 
@@ -200,7 +200,7 @@ def prompt_singleline(prompt_data):
     sys.stderr.write(highlighted)
 
     sys.stderr.write(question_mark + prompt.prompt + "\n")
-    user_input = input()
+    user_input = input(">")
     # print("User input:")
     # print("   >'{0}'<".format(user_input))
     while user_input == "":
@@ -243,26 +243,38 @@ def get_belief(scale_label, reason_label):
 
 
     sys.stderr.write(" "*8 + question_mark + reason_label + "\n")
-    reason = input()
-    if reason == "":
-        ValueError("journal.py: empty response")
+    reason = input(">")
+    # if reason == "":
+    #     ValueError("journal.py: empty response")
 
     sys.stderr.write(" "*8 + question_mark + scale_label + "\n")
     
-    belief_score = input()
-    if belief_score == "":
-        sys.stderr.write("journal.py needs a non-trivial belief score in the range (1 <=> 10)\n")
-        raise ValueError("journal.py thinks you don't belief in journal.py")
+    belief_score = input("(0:10) >")
+    # if belief_score == "":
+    #     sys.stderr.write("journal.py needs a non-trivial belief score in the range (1 <=> 10)\n")
+    #     raise ValueError("journal.py thinks you don't belief in journal.py")
 
-        
-    try:
+    if reason == "" and belief_score == "":
+        return None, None
+    elif re.match(r'^-?\d+(?:\.\d+)$', belief_score) is not None: # Catches float
+        #sys.stderr.write("Belief score was a float\n")
+        belief_score = float(belief_score)
+        pass
+    elif belief_score.isnumeric(): # Only catches int
+        #sys.stderr.write("Belief score was a int\n")
         belief_score = int(belief_score)
-    except ValueError as e:
-        sys.stderr.write("\n\njournal.py: Invalid belief score. Your belief is invalid. /s\n\n")
-        raise e
+        pass
+    else:
+        raise ValueError("\n\njournal.py: Invalid score/rating. Input should be a number on a scale of 0-10")
 
-    if type(belief_score) is not int or (belief_score < 1 or belief_score > 10):
-        raise ValueError("journal.prompt_belief expects a belief score in the range (1 <=> 10)")
+        # try:
+        #     belief_score = int(belief_score)
+        # except ValueError as e:
+        #     sys.stderr.write("\n\njournal.py: Invalid belief score. Your belief is invalid. /s\n\n")
+        #     raise e
+
+    if (belief_score < 0 or belief_score > 10):
+        raise ValueError("journal.prompt_belief expects a belief score in the range (0 <=> 10)")
 
 
         
@@ -294,7 +306,12 @@ def prompt_belief(prompt_data):
     return (belief_score, reason)
 
 
-def prompt_belief_list(prompt_data):
+def prompt_belief_list(prompt_data, scale_label:str=None, reason_label:str=None):
+    if scale_label is not None and reason_label is not None:
+        alt_labels = True
+    else:
+        alt_labels = False
+        
     try:
         validate(prompt_data, schemas.belief_schema)
     except ValidationError as e:
@@ -308,9 +325,16 @@ def prompt_belief_list(prompt_data):
     beliefs = []
     while True:
         try:
-            belief_score, reason = get_belief(prompt.scale_label, prompt.reason_label)
-            beliefs.append((belief_score, reason))
+            if alt_labels == True:
+                belief_score, reason = get_belief(scale_label, reason_label)
+            else:
+                belief_score, reason = get_belief(prompt.scale_label, prompt.reason_label)
+            if belief_score is None and reason is None:
+                break
+            else:
+                beliefs.append([belief_score, reason])
         except ValueError as e:
+            raise e
             if len(e.args) == 1 and "journal.py" in e.args[0]:
                 break
             else:

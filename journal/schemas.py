@@ -97,6 +97,8 @@ belief_schema = {
         "name": {"type": "string"},
         "prompt": {"type": "string"},
         "description": {"type": "string"},
+        "scale_label": {"type": "string"},
+        "reason_label": {"type": "string"},
     },
     "required": ["type", "name", "prompt", "description"]
 }

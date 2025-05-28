@@ -79,13 +79,17 @@ def main():
         prompts = tomllib.load(ifile)
         #print(prompts)
 
+    answers = []
+
+        
     """
     Booleans
     """
     
     for name, prompt_data in prompts["bool"].items():
-        helpers.prompt_boolean(prompt_data)
-        
+        bool_answer = helpers.prompt_boolean(prompt_data)
+        #prompts["bool"][name]["answers"] = bool_answer
+        answers.append([prompt_data["prompt"], bool_answer])
 
     """
     Choices (05/26/25: none)
@@ -108,41 +112,52 @@ def main():
     Text
     """
     for name, prompt_data in prompts["text"].items():
-        helpers.prompt_text(prompt_data)
+        text_answer = helpers.prompt_text(prompt_data)
+        #prompts["text"][name]["answers"] = text_answer
+        answers.append([prompt_data["prompt"], text_answer])
     """
     singleline
     """
     for name, prompt_data in prompts["singleline"].items():
-        helpers.prompt_singleline(prompt_data)
+        singleline_answer = helpers.prompt_singleline(prompt_data)
+        #prompts["singleline"][name]["answers"] = singleline_answer
+        answers.append([prompt_data["prompt"], singleline_answer])
     """
     multiline (05/26/25: random selection)
     """
     multiline_prompts = []
+    multiline_names = []
     for name, prompt_data in prompts["multiline"].items():
         multiline_prompts.append(prompt_data)
+        multiline_names.append(name)
     selected_prompts = random.sample(multiline_prompts, SAMPLE_MULTILINE) # randomly select n prompts from the 21 prompts (05/26/25)
-    for p in selected_prompts:
-        helpers.prompt_multiline(p)
-    
-    # belief_prompt_data = {
-    #     "type": "belief",
-    #     "name": "belief_ex",
-    #     "prompt": "Describe one thing you like about programming ",
-    #     "description": "Do you really REALLY like programming?"
-    # }
+    for i, p in enumerate(selected_prompts):
+        multiline_answers = helpers.prompt_multiline(p)
+        #prompts["multiline"][multiline_names[i]]["answers"] = multiline_answers
+        answers.append([prompt_data["prompt"], multiline_answers])
 
-    # helpers.prompt_belief(belief_prompt_data)
+    """
+    belief
+    """
+    # for name, prompt_data in prompts["belief"].items():
+    #     helpers.prompt_belief(prompt_data)
 
-    # belieflist_prompt_data = {
-    #     "type": "belief",
-    #     "name": "belieflist_ex",
-    #     "prompt": "What are a few healthy beliefs about a programming career?",
-    #     "description": "Do you really REALLY REALLY like programming?"
-    # }
+    """
+    belieflist
+    """
+    scale_label = None
+    reason_label = None
+    for name, prompt_data in prompts["belieflist"].items():
+        if "scale_label" in prompt_data.keys() and "reason_label" in prompt_data.keys():
+            scale_label=prompt_data["scale_label"]
+            reason_label=prompt_data["reason_label"]
+        belieflist_answers = helpers.prompt_belief_list(prompt_data, scale_label=scale_label, reason_label=reason_label)
+        #prompts["belieflist"][name]["answers"] = belieflist_answers
+        answers.append([prompt_data["prompt"], belieflist_answers])
 
-    
-    # helpers.prompt_belief_list(belieflist_prompt_data)
-    
+
+    print(yaml.dump(answers))
+        
 def cli():
     # parser = argparse.ArgumentParser()
     # parser.add_argument('--required', help="Required argument",required=True)
