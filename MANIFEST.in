@@ -1,1 +1,2 @@
 include journal/prompts.toml
+include journal/quotes.toml

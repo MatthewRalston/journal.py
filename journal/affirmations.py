@@ -54,7 +54,12 @@ def make_morning_affirmations():
     console.print(affirmations)
     time.sleep(8)
 
-    input("\n\nOkay...begin.")
+    input("\n\nOkay... begin. Good morning.\n")
+    journal_header_md = Markdown("\n\n# journal.py | brought to you by    Matt McMattface\n\n")
+    console.print(journal_header_md)
+
+
+
     
 def closing_thoughts():
     console.print(closing)

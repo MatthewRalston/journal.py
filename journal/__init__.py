@@ -32,6 +32,9 @@ import tomllib
 import yaml
 #import json
 
+from rich.console import Console
+from rich.markdown import Markdown
+
 import logging
 import logging.config
 
@@ -44,13 +47,15 @@ from journal import helpers, affirmations
 # CONSTANTS
 ####################
 
-
-
 PROMPTS_TOML = os.path.join(os.path.dirname(__file__), "prompts.toml")
+QUOTES_TOML = os.path.join(os.path.dirname(__file__), "quotes.toml")
+
 
 SAMPLE_MULTILINE = 3
 
-    
+console = Console()
+
+
 ####################
 # DATATYPES
 ####################
@@ -75,13 +80,8 @@ belief : dual prompt: 1:10 and single line explanation
 ####################
 
 
-def main():
-    
-    with open(PROMPTS_TOML, 'rb') as ifile:
-        prompts = tomllib.load(ifile)
-        #print(prompts)
-    answers = []
-    affirmations.make_morning_affirmations()
+def make_prompts(prompts:dict):
+    answers = []    
     """
     Booleans
     """
@@ -156,7 +156,7 @@ def main():
     today = str(datetime.date.today()).replace("-", "_")
 
     journal_metadata_file = "journal_metadata_{0}.yaml".format(today)
-    affirmations.closing_thoughts()
+
     with open(journal_metadata_file, 'w') as ofile:
         yaml.dump(answers, ofile, sort_keys=False)
     sys.stderr.write("\n\nWrote journal metadata answers to '{0}'...\n\n".format(journal_metadata_file))
@@ -170,7 +170,34 @@ def cli():
     # parser.add_argument('-v, --verbose', help="Prints warnings to console by default",default=0, action="count")
     # args = parser.parse_args()
     # Main routine
-    main()
+    with open(PROMPTS_TOML, 'rb') as ifile:
+        prompts = tomllib.load(ifile)
+        #print(prompts)
+    with open(QUOTES_TOML, 'rb') as ifile:
+        quotes = tomllib.load(ifile)
+
+
+
+        
+    affirmations.make_morning_affirmations()
+
+    quots = [(q["author"], q["quote"]) for n, q in quotes["quotes"].items()]
+    quote_of_the_day = random.sample(quots, 1)[0]
+
+    console.print(Markdown("# Quote of the day"))
+
+
+    print("\n\n\n")
+    print(quote_of_the_day[1])
+    print("    - {0}".format(quote_of_the_day[0]))
+    print("\n\n\n")
+    affirmations.greet_al()
+    affirmations.greet_mom()
+    affirmations.greet_dad()
+
+    make_prompts(prompts)
+    
+    affirmations.closing_thoughts()
 
 
 ####################
