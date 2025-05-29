@@ -71,7 +71,8 @@ dependencies = [
 	     "prompt_toolkit>=3.0.51",
 	     "pydantic>=2.11.5",
 	     "Pygments>=2.18.0",
-	     "PyYAML>=6.0.1", # was before the influence	     
+	     "PyYAML>=6.0.1", # was before the influence
+	     "rich>=14.0.0",
 	     "jsonschema>=4.23.0",
              "setuptools>=69.2.0",
 	     ]

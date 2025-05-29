@@ -22,10 +22,11 @@
 ####################
 import os
 #import argparse
-import copy
 import sys
 
+import datetime
 import random
+import copy
 
 import tomllib
 import yaml
@@ -35,7 +36,7 @@ import logging
 import logging.config
 
 
-from journal import helpers
+from journal import helpers, affirmations
 
 
 
@@ -75,27 +76,23 @@ belief : dual prompt: 1:10 and single line explanation
 
 
 def main():
+    
     with open(PROMPTS_TOML, 'rb') as ifile:
         prompts = tomllib.load(ifile)
         #print(prompts)
-
     answers = []
-
-        
+    affirmations.make_morning_affirmations()
     """
     Booleans
     """
-    
     for name, prompt_data in prompts["bool"].items():
         bool_answer = helpers.prompt_boolean(prompt_data)
         #prompts["bool"][name]["answers"] = bool_answer
         answers.append([prompt_data["prompt"], bool_answer])
-
     """
     Choices (05/26/25: none)
     """
     # helpers.prompt_choice(choice_prompt_data)
-
     """
     Multichoice (05/26/25: none)
     """
@@ -140,7 +137,8 @@ def main():
     belief
     """
     # for name, prompt_data in prompts["belief"].items():
-    #     helpers.prompt_belief(prompt_data)
+    #     belief_answer = helpers.prompt_belief(prompt_data)
+    #     answers.append([prompt_data["prompt"], belief_answer])
 
     """
     belieflist
@@ -155,8 +153,15 @@ def main():
         #prompts["belieflist"][name]["answers"] = belieflist_answers
         answers.append([prompt_data["prompt"], belieflist_answers])
 
+    today = str(datetime.date.today()).replace("-", "_")
 
-    print(yaml.dump(answers))
+    journal_metadata_file = "journal_metadata_{0}.yaml".format(today)
+    affirmations.closing_thoughts()
+    with open(journal_metadata_file, 'w') as ofile:
+        yaml.dump(answers, ofile, sort_keys=False)
+    sys.stderr.write("\n\nWrote journal metadata answers to '{0}'...\n\n".format(journal_metadata_file))
+
+    #print(yaml.dump(answers))
         
 def cli():
     # parser = argparse.ArgumentParser()
