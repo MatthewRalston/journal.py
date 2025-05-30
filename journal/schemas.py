@@ -4,20 +4,20 @@ from jsonschema import validate
 boolean_schema = {
     "type": "object",
     "properties": {
-        "type": {"type": "string"},
+        "prompt_type": {"type": "string"},
         "name": {"type": "string"},
         "prompt": {"type": "string"},
         "description": {"type": "string"},
         "default": {"type": "string"}
     },
-    "required": ["type", "name", "prompt", "description" ]
+    "required": ["prompt_type", "name", "prompt", "description" ]
 }
 
 
 choice_schema = {
     "type": "object",
     "properties": {
-        "type": {"type": "string"},
+        "prompt_type": {"type": "string"},
         "name": {"type": "string"},
         "prompt": {"type": "string"},
         "description": {"type": "string"},
@@ -27,13 +27,13 @@ choice_schema = {
             "items": {"type": "string"}
         }
     },
-    "required": ["type", "name", "prompt", "description", "default", "choices"]
+    "required": ["prompt_type", "name", "prompt", "description", "default", "choices"]
 }
 
 multichoice_schema = {
     "type": "object",
     "properties": {
-        "type": {"type": "string"},
+        "prompt_type": {"type": "string"},
         "name": {"type": "string"},
         "prompt": {"type": "string"},
         "description": {"type": "string"},
@@ -46,19 +46,19 @@ multichoice_schema = {
             "items": {"type": "string"}
         }
     },
-    "required": ["type", "name", "prompt", "description", "default", "choices"]
+    "required": ["prompt_type", "name", "prompt", "description", "default", "choices"]
 }
 
 
 text_schema = {
     "type": "object",
     "properties": {
-        "type": {"type": "string"},
+        "prompt_type": {"type": "string"},
         "name": {"type": "string"},
         "prompt": {"type": "string"},
         "description": {"type": "string"},
     },
-    "required": ["type", "name", "prompt", "description"]
+    "required": ["prompt_type", "name", "prompt", "description"]
 }
 
 
@@ -66,12 +66,12 @@ text_schema = {
 singleline_schema = {
     "type": "object",
     "properties": {
-        "type": {"type": "string"},
+        "prompt_type": {"type": "string"},
         "name": {"type": "string"},
         "prompt": {"type": "string"},
         "description": {"type": "string"},
     },
-    "required": ["type", "name", "prompt", "description"]
+    "required": ["prompt_type", "name", "prompt", "description"]
 }
 
 
@@ -81,25 +81,57 @@ singleline_schema = {
 multiline_schema = {
     "type": "object",
     "properties": {
-        "type": {"type": "string"},
+        "prompt_type": {"type": "string"},
         "name": {"type": "string"},
         "prompt": {"type": "string"},
         "description": {"type": "string"},
     },
-    "required": ["type", "name", "prompt", "description"]
+    "required": ["prompt_type", "name", "prompt", "description"]
 }
 
 
 belief_schema = {
     "type": "object",
     "properties": {
-        "type": {"type": "string"},
+        "prompt_type": {"type": "string"},
         "name": {"type": "string"},
         "prompt": {"type": "string"},
         "description": {"type": "string"},
         "scale_label": {"type": "string"},
         "reason_label": {"type": "string"},
     },
-    "required": ["type", "name", "prompt", "description"]
+    "required": ["prompt_type", "name", "prompt", "description"]
 }
+
+goal_schema = {
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "prompt_type": {"type": "string"},
+            "name": {"type": "string"},
+            "description": {"type": "string"},
+            "priority": {"type": "number"},
+            "effort": {"type": "number"},
+            "date": {"type": "string"}
+        },
+        "required": ["prompt_type", "name", "description", "priority", "effort", "date"]
+    }
+}
+
+
+goal_prompt_schema = {
+    "type": "object",
+    "properties": {
+        "prompt_type": {"type": "string"},
+        "name": {"type": "string"},
+        "description": {"type": "string"},
+        "prompt": {"type": "string"},
+        "priority_label": {"type": "string"},
+        "effort_label": {"type": "string"},
+        "desc_prompt_label": {"type": "string"},
+    },
+    "required": ["prompt_type", "name", "description", "prompt", "priority_label", "effort_label", "desc_prompt_label"]
+}
+
 

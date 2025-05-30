@@ -27,10 +27,11 @@ import sys
 import datetime
 import random
 import copy
+from pathlib import Path
 
 import tomllib
 import yaml
-#import json
+import json
 
 from rich.console import Console
 from rich.markdown import Markdown
@@ -47,9 +48,14 @@ from journal import helpers, affirmations
 # CONSTANTS
 ####################
 
-PROMPTS_TOML = os.path.join(os.path.dirname(__file__), "prompts.toml")
-QUOTES_TOML = os.path.join(os.path.dirname(__file__), "quotes.toml")
 
+JOURNAL_DIR = "/ffast/Documents/orgs/journal"
+
+
+PROMPTS_TOML = os.path.join(os.path.dirname(__file__), "prompts.toml")
+QUOTES_TOML  = os.path.join(os.path.dirname(__file__), "quotes.toml")
+GOALS_JSON   = os.path.join(os.path.dirname(__file__), "goals.json")
+#GOALS_JSON   = os.path.join(Path.home(), ".goals.json")
 
 SAMPLE_MULTILINE = 3
 
@@ -132,19 +138,19 @@ def make_prompts(prompts:dict):
         multiline_answers = helpers.prompt_multiline(p)
         #prompts["multiline"][multiline_names[i]]["answers"] = multiline_answers
         answers.append([prompt_data["prompt"], multiline_answers])
-
     """
     belief
     """
     # for name, prompt_data in prompts["belief"].items():
     #     belief_answer = helpers.prompt_belief(prompt_data)
     #     answers.append([prompt_data["prompt"], belief_answer])
-
     """
     belieflist
     """
     scale_label = None
     reason_label = None
+
+    
     for name, prompt_data in prompts["belieflist"].items():
         if "scale_label" in prompt_data.keys() and "reason_label" in prompt_data.keys():
             scale_label=prompt_data["scale_label"]
@@ -155,48 +161,60 @@ def make_prompts(prompts:dict):
 
     today = str(datetime.date.today()).replace("-", "_")
 
-    journal_metadata_file = "journal_metadata_{0}.yaml".format(today)
+    journal_metadata_file = os.path.join(JOURNAL_DIR, "journal_metadata_{0}.yaml".format(today))
 
     with open(journal_metadata_file, 'w') as ofile:
         yaml.dump(answers, ofile, sort_keys=False)
     sys.stderr.write("\n\nWrote journal metadata answers to '{0}'...\n\n".format(journal_metadata_file))
+    # print(yaml.dump(answers))
+    return answers
 
-    #print(yaml.dump(answers))
-        
+    
+
+    
 def cli():
-    # parser = argparse.ArgumentParser()
-    # parser.add_argument('--required', help="Required argument",required=True)
-    # parser.add_argument('--flag', help="This is a flag",action="store_true")
-    # parser.add_argument('-v, --verbose', help="Prints warnings to console by default",default=0, action="count")
-    # args = parser.parse_args()
-    # Main routine
-    with open(PROMPTS_TOML, 'rb') as ifile:
+    """
+    Main routine:
+    """
+    with open(PROMPTS_TOML, 'rb') as ifile: # Open journal prompts
         prompts = tomllib.load(ifile)
-        #print(prompts)
-    with open(QUOTES_TOML, 'rb') as ifile:
+    with open(QUOTES_TOML, 'rb') as ifile: # Open quotes file
         quotes = tomllib.load(ifile)
-
-
-
-        
+    quots = [(q["author"], q["quote"]) for n, q in quotes["quotes"].items()] # Reorganize quotes.toml (a n n o y i n g - fuck these markup languages)
+    quote_of_the_day = random.sample(quots, 1)[0] # Select 1 quote randomly
+    with open(GOALS_JSON, 'r') as ifile: # Open up goals repository
+        goals = yaml.safe_load(ifile)
+        if goals is None: # Initialize goals list to empty if no goals are found
+            goals = []
+    """
+    Morning affirmations (old template.md header) # Thanks mom and dad. And especially you, Allison.
+    """ 
     affirmations.make_morning_affirmations()
+    affirmations.greet_al()
+    affirmations.greet_mom()
+    affirmations.greet_dad()
+    """
+    Make trackable prompts for longitudinal/posterity
+    """
+    journal_prompts = make_prompts(prompts)
+    """
+    Set goals (move to bottom)
+    """
+    goal_list = helpers.create_goal_list(goals)
+    with open(GOALS_JSON, 'w') as ofile:
+        ofile.write(json.dumps(goal_list, indent=2))
 
-    quots = [(q["author"], q["quote"]) for n, q in quotes["quotes"].items()]
-    quote_of_the_day = random.sample(quots, 1)[0]
-
+    """
+    Quote of the day
+    """
     console.print(Markdown("# Quote of the day"))
-
-
     print("\n\n\n")
     print(quote_of_the_day[1])
     print("    - {0}".format(quote_of_the_day[0]))
     print("\n\n\n")
-    affirmations.greet_al()
-    affirmations.greet_mom()
-    affirmations.greet_dad()
-
-    make_prompts(prompts)
-    
+    """
+    Closing thoughts
+    """
     affirmations.closing_thoughts()
 
 

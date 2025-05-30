@@ -1,2 +1,3 @@
 include journal/prompts.toml
 include journal/quotes.toml
+include journal/goals.json

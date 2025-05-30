@@ -1,7 +1,10 @@
-
-import sys
 import os
+import sys
+
+import datetime
 import re
+
+
 
 import inquirer
 
@@ -238,21 +241,46 @@ def prompt_multiline(prompt_data):
             lines.append(line)
     return lines
 
+def get_goal(prompt, goal_prompt_description, desc_prompt_label, priority_label, effort_label):
+    """
+    This function prompts the user, with given labels, for a goal name, description, a priority, and a effort score (in # of days)
+    """
+
+    desc = "{0}\n{0}\n{1}\n{0}\n{0}".format(" "*len(goal_prompt_description), goal_prompt_description)
+    highlighted = highlight(desc, PlainGreenLexer(), Terminal256Formatter(style=JournalPromptStyle))
+    
+    sys.stderr.write(highlighted)
+    sys.stderr.write(question_mark + prompt + "\n\n")
+    goal_short_desc = input(">") # GET goal name
+
+    
+    sys.stderr.write(" "*8 + question_mark + desc_prompt_label + "\n")
+    goal_desc = input(">") # GET goal description
+    sys.stderr.write(" "*8 + question_mark + priority_label + "\n")
+    priority = input("(1:10) >") # GET goal priority
+    sys.stderr.write(" "*8 + question_mark + effort_label + "\n")
+    effort = input("(1:7) >") # GET goal effort
+
+    if goal_short_desc == "" and goal_desc == "" and priority == "" and effort == "":
+        return None, None, None, None
+    elif priority.isnumeric() and effort.isnumeric():
+        priority = int(priority)
+        effort = int(effort)
+        pass
+    else:
+        raise ValueError("\n\njournal.py: Invalid goal, description, priority, or effort estimate. Inputs should be strings or integers\n\n")
+
+    if priority > 10 or priority < 1 or effort < 1 or effort > 7:
+        raise ValueError("\n\njournal.py: Invalid priority/effort. See scale above for priority/effort\n\n")
+    return goal_short_desc, goal_desc, priority, effort
+    
 
 def get_belief(scale_label, reason_label):
-
-
     sys.stderr.write(" "*8 + question_mark + reason_label + "\n")
     reason = input(">")
-    # if reason == "":
-    #     ValueError("journal.py: empty response")
-
     sys.stderr.write(" "*8 + question_mark + scale_label + "\n")
     
     belief_score = input("(0:10) >")
-    # if belief_score == "":
-    #     sys.stderr.write("journal.py needs a non-trivial belief score in the range (1 <=> 10)\n")
-    #     raise ValueError("journal.py thinks you don't belief in journal.py")
 
     if reason == "" and belief_score == "":
         return None, None
@@ -265,7 +293,7 @@ def get_belief(scale_label, reason_label):
         belief_score = int(belief_score)
         pass
     else:
-        raise ValueError("\n\njournal.py: Invalid score/rating. Input should be a number on a scale of 0-10")
+        raise ValueError("\n\njournal.py: Invalid score/rating. Input should be a number on a scale of 0-10\n\n")
 
         # try:
         #     belief_score = int(belief_score)
@@ -349,3 +377,118 @@ def text_input(prompt):
     text = session.prompt("Enter text (Ctrl+n to submit):\n")
     #print("Your text: \n{0}".format(text))
     return text
+
+
+def create_goal_list(goals):
+    no_goals = False
+
+    if type(goals) is not list:
+        raise TypeError("journal.helpers.create_goal_list expects a list as its first positional argument")
+    elif len(goals) == 0:
+        no_goals = True
+    elif not all([type(g) is dict for g in goals]):
+        raise TypeError("journal.helpers.create_goal_list expects a list of dictionaries as its first positional argument")
+    
+    today = str(datetime.datetime.today())
+    existing_goals_list = []
+    new_goals_list = []
+    existing_goals_prompt_data = {
+        "prompt_type": "goal",
+        "name": "existing_goals",
+        "prompt": "Which goals should you continue to pursue?",
+        "description": "Select existing goals below to focus"
+    }
+    
+    new_goals_prompt_data = {
+        "prompt_type": "goal",
+        "name": "goal_list",
+        "prompt": "Create a goal (short description, long description, priority, and effort)",
+        "description": "Focus on habits, work, and deliverables",
+        "priority_label": "What is the priority?",
+        "effort_label": "Estimate the effort (in days)",
+        "desc_prompt_label": "Describe the goal. Be verbose for me.",
+    }
+    try:
+        if no_goals is False:
+            validate(goals, schemas.goal_schema)
+            sys.stderr.write("\n\nExisting goals read and validated successfully...\n\n")
+        validate(new_goals_prompt_data, schemas.goal_prompt_schema)
+    except ValidationError as e:
+        raise e
+
+
+
+    """
+    Custom code to re-select existing goals read from the goals.json file
+    """
+    # [TODO] HERE the 'choices' option is populated with the goal name
+
+    if no_goals is False:
+        existing_goals_prompt_data["choices"] = list(map(lambda g: g["name"], goals))
+        prompt = prompts.GoalPrompt(**existing_goals_prompt_data)
+
+    
+        desc = "{0}\n{0}\n{1}\n{0}\n{0}".format(" "*len(prompt.description), prompt.description)
+        highlighted = highlight(desc, PlainGreenLexer(), Terminal256Formatter(style=JournalPromptStyle))
+        sys.stderr.write(highlighted)
+
+    
+        answers = inquirer.prompt([
+            inquirer.Checkbox(
+                name=prompt.name,
+                message=prompt.prompt,
+                choices=prompt.choices,
+                default=prompt.default
+            )
+        ])
+        try:
+            existing_goal_names = answers[prompt.name]
+            prompt.validate_selections(existing_goal_names)
+            # print("Selections:")
+            # print(user_input)
+        except ValidationError as e:
+            raise e
+        sys.stderr.write("\n\nRe-selected goals: {0}\n\n".format(existing_goal_names))
+
+        existing_goals_list = [g for g in goals if g["name"] in existing_goal_names]
+        sys.stderr.write("\n\nFinished assessing existing goals...\n\n\n")
+
+    """
+    New goals
+    """
+    #print(new_goals_prompt_data)
+    prompt = prompts.GoalPrompt(**new_goals_prompt_data)
+
+    name = new_goals_prompt_data["name"]
+    description = new_goals_prompt_data["description"]
+    prompt = new_goals_prompt_data["prompt"]
+    priority_label = new_goals_prompt_data["priority_label"]
+    effort_label = new_goals_prompt_data["effort_label"]
+    desc_prompt_label = new_goals_prompt_data["desc_prompt_label"]
+
+    """
+    Hoisted code to get additional goal descriptions, priorities, efforts.
+    """
+    while True:
+        try:
+            name, goal_desc, priority, effort = get_goal(prompt, description, desc_prompt_label, priority_label, effort_label)
+            if goal_desc is None and priority is None and effort is None:
+                break
+            else:
+                new_goals_list.append({
+                    "prompt_type": "goal",
+                    "name": name,
+                    "description": goal_desc,
+                    "priority": priority,
+                    "effort": effort,
+                    "date": today
+                })
+        except ValueError as e:
+            raise e
+            if len(e.args) == 1 and "journal.py" in e.args[0]:
+                break
+            else:
+                sys.stderr.write("Unknown error occurred.")
+                raise e
+    final_goals_list = new_goals_list + existing_goals_list
+    return final_goals_list
