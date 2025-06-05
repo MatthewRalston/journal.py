@@ -259,7 +259,7 @@ def get_goal(prompt, goal_prompt_description, desc_prompt_label, priority_label,
     sys.stderr.write(" "*8 + question_mark + priority_label + "\n")
     priority = input("(1:10) >") # GET goal priority
     sys.stderr.write(" "*8 + question_mark + effort_label + "\n")
-    effort = input("(1:7) >") # GET goal effort
+    effort = input("(1:60) >") # GET goal effort
 
     if goal_short_desc == "" and goal_desc == "" and priority == "" and effort == "":
         return None, None, None, None
@@ -270,7 +270,7 @@ def get_goal(prompt, goal_prompt_description, desc_prompt_label, priority_label,
     else:
         raise ValueError("\n\njournal.py: Invalid goal, description, priority, or effort estimate. Inputs should be strings or integers\n\n")
 
-    if priority > 10 or priority < 1 or effort < 1 or effort > 7:
+    if priority > 10 or priority < 1 or effort < 1 or effort > 60:
         raise ValueError("\n\njournal.py: Invalid priority/effort. See scale above for priority/effort\n\n")
     return goal_short_desc, goal_desc, priority, effort
     

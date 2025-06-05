@@ -85,11 +85,11 @@ name = "looking_forward_to"
 prompt = "What are you looking forward to?"
 description = "Events, food, shopping, milestone?"
 
-[multiline.how_much_time]
-prompt_type = "multiline"
-name = "how_much_time"
-prompt = "How much time can you budget to each item today?"
-description = "For each item on your todo list, how much time does each require?"
+# [multiline.how_much_time]
+# prompt_type = "multiline"
+# name = "how_much_time"
+# prompt = "How much time can you budget to each item today?"
+# description = "For each item on your todo list, how much time does each require?"
 
 [multiline.lieing_to_myself]
 prompt_type = "multiline"
@@ -264,11 +264,46 @@ description = "What could you have done differently? What does hindsight show? H
 
 [belieflist]
 
+[belieflist.healthy_beliefs]
+prompt_type = "belief"
+name = "healthy_beliefs"
+prompt = "What assumptions can I make that are positive?"
+description = "Good assumptions are likely to be true (1:10). Topics include society, state of mind, steps in the journey, and better self image"
+scale_label = "How strong is this belief?"
+reason_label = "What is the assumption?"
+
+[belieflist.unhealthy_beliefs]
+prompt_type = "belief"
+name = "unhealthy_beliefs"
+prompt = "What bad assumptions am I making?"
+description = "Bad assumptions aren't just unlikely to be true (1:10). They involve speculation and delusional or paranoid thinking or extend to topics where too much uncertainty clouds the effectiveness of the belief and its application to my life."
+scale_label = "How strong is this belief?"
+reason_label = "What is the assumption?"
+
+
+#        task vs goals : time management and planning topics
+
+[belieflist.good_work_assumptions]
+prompt_type = "belief"
+name = "good_work_task_goal_assumptions"
+prompt = "What are some good assumptions I can make to simplify my efforts/work?"
+description = "Good assumptions simplify your efforts and clarify objectives. Constrain your efforts and the objectives of a goal with assumptions."
+scale_label = "How important is this statement/question to the goal at hand?"
+reason_label = "What is the assumption or question? Where does it lead?"
+
+[belieflist.bad_work_assumptions]
+prompt_type = "belief"
+name = "bad_work_task_goal_assumptions"
+prompt = "What weak assumptions are leading to wasted effort? Focus on statement, not remedy."
+description = "Bad assumptions provide unneeded structure, or provide options that add complexity in the approach towards objectives. Focus on stating the nature of these time wasters, rather than fixing them just yet."
+scale_label = "How much is this statement/question detracting from the goals at hand?"
+reason_label = "What is the assumption or question? Where does it lead?"
+
 
 [belieflist.time_management]
 prompt_type = "belief"
 name = "time_management"
-prompt = "Create a time budget/schedule for todays tasks."
+prompt = "Create a time budget/schedule for todays tasks. (not goals)"
 description = "What tasks do you have? How much time does each need?"
 scale_label = "How many hours?"
 reason_label = "Describe your task"
