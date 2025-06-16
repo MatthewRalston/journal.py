@@ -88,6 +88,10 @@ belief : dual prompt: 1:10 and single line explanation
 
 def make_prompts(prompts:dict):
     answers = []    
+
+    today = str(datetime.date.today()).replace("-", "_")
+    journal_metadata_file = os.path.join(JOURNAL_DIR, "journal_metadata_{0}.yaml".format(today))
+    
     """
     Booleans
     """
@@ -95,6 +99,9 @@ def make_prompts(prompts:dict):
         bool_answer = helpers.prompt_boolean(prompt_data)
         #prompts["bool"][name]["answers"] = bool_answer
         answers.append([prompt_data["prompt"], bool_answer])
+    with open(journal_metadata_file, 'w') as ofile:
+        yaml.dump(answers, ofile, sort_keys=False)
+
     """
     Choices (05/26/25: none)
     """
@@ -118,6 +125,10 @@ def make_prompts(prompts:dict):
         text_answer = helpers.prompt_text(prompt_data)
         #prompts["text"][name]["answers"] = text_answer
         answers.append([prompt_data["prompt"], text_answer])
+
+    with open(journal_metadata_file, 'w') as ofile:
+        yaml.dump(answers, ofile, sort_keys=False)
+
     """
     singleline
     """
@@ -125,6 +136,10 @@ def make_prompts(prompts:dict):
         singleline_answer = helpers.prompt_singleline(prompt_data)
         #prompts["singleline"][name]["answers"] = singleline_answer
         answers.append([prompt_data["prompt"], singleline_answer])
+
+    with open(journal_metadata_file, 'w') as ofile:
+        yaml.dump(answers, ofile, sort_keys=False)
+
     """
     multiline (05/26/25: random selection)
     """
@@ -138,6 +153,10 @@ def make_prompts(prompts:dict):
         multiline_answers = helpers.prompt_multiline(p)
         #prompts["multiline"][multiline_names[i]]["answers"] = multiline_answers
         answers.append([prompt_data["prompt"], multiline_answers])
+
+    with open(journal_metadata_file, 'w') as ofile:
+        yaml.dump(answers, ofile, sort_keys=False)
+
     """
     belief
     """
@@ -159,9 +178,9 @@ def make_prompts(prompts:dict):
         #prompts["belieflist"][name]["answers"] = belieflist_answers
         answers.append([prompt_data["prompt"], belieflist_answers])
 
-    today = str(datetime.date.today()).replace("-", "_")
 
-    journal_metadata_file = os.path.join(JOURNAL_DIR, "journal_metadata_{0}.yaml".format(today))
+
+
 
     with open(journal_metadata_file, 'w') as ofile:
         yaml.dump(answers, ofile, sort_keys=False)
